@@ -185,6 +185,7 @@ label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;displa
 .chinese-panel.active{display:block;animation:fade .3s}
 
 .word-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.word-grid.cols-3{grid-template-columns:repeat(3,1fr)!important}
 .word-card{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all .15s}
 .word-card:hover{border-color:var(--cyan);box-shadow:var(--shadow)}
 .word-card:active{transform:scale(.95)}
@@ -852,8 +853,7 @@ label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;displa
   <div class="section-title"><span class="emoji">🌐</span>英语星球</div>
   <div class="card">
     <div class="cat-tabs" id="englishCatTabs">
-      <div class="cat-tab active" data-ecat="letters">字母巩固</div>
-      <div class="cat-tab" data-ecat="words">单词分类</div>
+      <div class="cat-tab active" data-ecat="words">单词分类</div>
       <div class="cat-tab" data-ecat="spell">拼写挑战</div>
       <div class="cat-tab" data-ecat="match">英汉配对</div>
     </div>
@@ -1186,17 +1186,6 @@ const englishWords = {
     {en:'morning',zh:'早上',i:'🌅',e:'Good morning!'},{en:'afternoon',zh:'下午',i:'🌇',e:'See you this afternoon.'},{en:'evening',zh:'晚上',i:'🌆',e:'Good evening!'},{en:'soon',zh:'很快',i:'⏳',e:'I will finish soon.'}
   ]
 };
-
-const lettersData = [
-  {l:'A',w:'Apple',p:'æ'},{l:'B',w:'Bear',p:'bi:'},{l:'C',w:'Cat',p:'si:'},{l:'D',w:'Dog',p:'di:'},
-  {l:'E',w:'Egg',p:'i:'},{l:'F',w:'Fish',p:'ef'},{l:'G',w:'Goat',p:'dʒi:'},{l:'H',w:'Hat',p:'eɪtʃ'},
-  {l:'I',w:'Ice',p:'aɪ'},{l:'J',w:'Juice',p:'dʒeɪ'},{l:'K',w:'Kite',p:'keɪ'},{l:'L',w:'Lion',p:'el'},
-  {l:'M',w:'Monkey',p:'em'},{l:'N',w:'Nose',p:'en'},{l:'O',w:'Orange',p:'oʊ'},{l:'P',w:'Pig',p:'pi:'},
-  {l:'Q',w:'Queen',p:'kju:'},{l:'R',w:'Rabbit',p:'ɑ:'},{l:'S',w:'Sun',p:'es'},{l:'T',w:'Tiger',p:'ti:'},
-  {l:'U',w:'Umbrella',p:'ju:'},{l:'V',w:'Van',p:'vi:'},{l:'W',w:'Wolf',p:'dʌbəlju:'},{l:'X',w:'X-ray',p:'eks'},
-  {l:'Y',w:'Yellow',p:'waɪ'},{l:'Z',w:'Zoo',p:'zi:'}
-];
-const vowels = ['A','E','I','O','U'];
 
 /* Poems with pinyin */
 const poemsData = [
@@ -2072,33 +2061,6 @@ function speak(text, lang){
 function speakCN(text){ speak(text, 'zh-CN'); }
 function speakEN(text){ speak(text, 'en-US'); }
 
-/* 字母卡片专用：先读字母名，停顿片刻，再读单词 */
-let letterTimer = null;
-function speakLetter(letter, word){
-  if(!('speechSynthesis' in window)){
-    showToast('浏览器不支持语音朗读');
-    return;
-  }
-  speechSynthesis.cancel();
-  if(letterTimer){ clearTimeout(letterTimer); }
-  let wordSpoken = false;
-  const speakWord = ()=>{
-    if(wordSpoken) return;
-    wordSpoken = true;
-    const u2 = new SpeechSynthesisUtterance(word);
-    u2.lang = 'en-US';
-    u2.rate = 0.75;
-    speechSynthesis.speak(u2);
-  };
-  const u1 = new SpeechSynthesisUtterance(letter);
-  u1.lang = 'en-US';
-  u1.rate = 0.7;
-  u1.onend = ()=>{ letterTimer = setTimeout(speakWord, 800); };  // 字母读完停 0.8 秒再读单词
-  speechSynthesis.speak(u1);
-  // 兜底：个别浏览器不触发 onend，按字母时长估算
-  letterTimer = setTimeout(speakWord, 1400);
-}
-
 /* ================================================================
    STAR & BADGE SYSTEM
    ================================================================ */
@@ -2697,7 +2659,7 @@ function switchSection(name){
 
   // Render section content
   if(name==='today') renderToday();
-  else if(name==='english') renderEnglish('letters');
+  else if(name==='english') renderEnglish('words');
   else if(name==='chinese') renderChinese();
   else if(name==='math') renderMath(mathCat);
   else if(name==='thinking') renderThinking();
@@ -3112,7 +3074,7 @@ function resetPomodoro(){
 /* ================================================================
    ENGLISH MODULE
    ================================================================ */
-let englishCat = 'letters';
+let englishCat = 'words';
 
 document.getElementById('englishCatTabs').addEventListener('click', e=>{
   const tab = e.target.closest('.cat-tab');
@@ -3127,28 +3089,7 @@ function renderEnglish(cat){
   englishCat = cat || englishCat;
   const container = document.getElementById('englishContent');
   
-  if(englishCat === 'letters'){
-    container.innerHTML = `
-      <div class="card-title"><span class="emoji">🔤</span>26个英文字母</div>
-      <div class="letter-grid">${lettersData.map(l=>{
-        const isVowel = vowels.includes(l.l);
-        return `<div class="letter-card ${isVowel?'vowel':''}" onclick="speakLetter('${l.l}','${l.w}')">
-          <div class="lc-letter">${l.l}</div>
-          <div class="lc-word">${l.w}</div>
-        </div>`;
-      }).join('')}</div>
-      <div class="card-title mt12"><span class="emoji">🌟</span>元音字母（点击朗读）</div>
-      <div class="letter-grid">${vowels.map(v=>{
-        const data = lettersData.find(l=>l.l===v);
-        return `<div class="letter-card vowel" onclick="speakLetter('${v}','${data.w}')">
-          <div class="lc-letter">${v}</div>
-          <div class="lc-word">${data.w}</div>
-        </div>`;
-      }).join('')}</div>
-      <div class="hint-text mt12">点击卡片：先读字母名，停一下，再读单词，跟着大声念！</div>
-    `;
-  }
-  else if(englishCat === 'words'){
+  if(englishCat === 'words'){
     let cats = Object.keys(englishWords);
     container.innerHTML = `
       <div class="card-title"><span class="emoji">📚</span>单词分类学习</div>
@@ -3184,7 +3125,9 @@ function renderEnglish(cat){
 
 function renderWordGrid(cat){
   const words = englishWords[cat];
-  document.getElementById('wordGrid').innerHTML = words.map(w=>
+  const grid = document.getElementById('wordGrid');
+  grid.className = 'word-grid' + (cat === '比较级·最高级' ? ' cols-3' : '');
+  grid.innerHTML = words.map(w=>
     `<div class="word-card" onclick="speakEN('${w.en}')">
       <div class="wc-en">${w.en}</div>
       <div class="wc-zh">${w.zh}</div>
