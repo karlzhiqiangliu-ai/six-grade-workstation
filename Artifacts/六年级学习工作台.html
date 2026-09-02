@@ -775,7 +775,7 @@ label{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:6px;displa
   <!-- Today's goals -->
   <div class="card">
     <div class="card-title"><span class="emoji">🎯</span>今日重点挑战</div>
-    <div class="hint-text mt12">选一个今天想重点突破的目标，点一下就能设定：</div>
+    <div class="hint-text mt12">选一个今天想重点突破的目标，点「确定」就会直接带你过去开练：</div>
     <div id="goalQuickPicker" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px"></div>
     <div class="mt12" style="display:flex;gap:8px">
       <input class="input" id="todayGoalInput" placeholder="或者自己写一个小目标~" style="flex:1" value="">
@@ -2915,6 +2915,46 @@ function renderToday(){
   updateStarDisplay();
 }
 
+/* 数学王国：按 data-mcat 选中对应题型分类并渲染 */
+function selectMathCat(mcat){
+  mathCat = mcat;
+  document.querySelectorAll('#mathCatTabs .cat-tab').forEach(t=>t.classList.toggle('active', t.dataset.mcat===mcat));
+  renderMath(mathCat);
+}
+
+/* 根据「今日重点挑战」的目标，立即跳转到对应模块 / 子页，让孩子点完确定就直接开练 */
+function jumpToGoalTarget(text){
+  const def = goalQuickDefs.find(g=>g.text===text);
+  if(!def) return false;                       // 自定义目标无法定位到具体模块，不跳转
+  const cat = def.cat;
+  /* 跳完把视图滚到顶部，避免停留在今日页底部 */
+  const goTop = ()=>{ window.scrollTo(0,0); const m=document.getElementById('main'); if(m) m.scrollTop=0; };
+  if(cat === '数学'){
+    let mcat = null, label = '';
+    if(text.includes('分数乘除')){ mcat='fraction'; label='分数乘除'; }
+    else if(text.includes('百分数')){ mcat='percent'; label='百分数'; }
+    else if(text.includes('圆')){ mcat='circle'; label='圆与扇形'; }
+    switchSection('math');
+    if(mcat) selectMathCat(mcat);
+    showToast('已为你打开「数学王国」'+(label?('· '+label):'')+'，开始挑战吧！');
+    goTop();
+    return true;
+  }
+  if(cat === '古诗'){ switchSection('chinese'); switchChineseTab('poetry'); showToast('已为你打开「诗文花园」· 背诵古诗，开始吧！'); goTop(); return true; }
+  if(cat === '英语'){ switchSection('english'); showToast('已为你打开「英语星球」，开始吧！'); goTop(); return true; }
+  if(cat === '闯关'){ switchSection('adventure'); setTimeout(startAdventure, 200); showToast('已为你打开「闯关冒险乐园」，开始吧！'); goTop(); return true; }
+  if(cat === '思维'){ switchSection('thinking'); showToast('已为你打开「思维训练场」，开始吧！'); goTop(); return true; }
+  if(cat === '成语'){ switchSection('chinese'); switchChineseTab('idiom'); showToast('已为你打开「成语百宝箱」，开始吧！'); goTop(); return true; }
+  if(cat === '阅读'){
+    switchSection('chinese');
+    if(text.includes('打卡')){ switchChineseTab('booklog'); showToast('已为你打开「阅读打卡」，开始吧！'); }
+    else { switchChineseTab('reading'); showToast('已为你打开「语文阅读站」，开始吧！'); }
+    goTop();
+    return true;
+  }
+  return false;
+}
+
 function saveTodayGoal(){
   const val = document.getElementById('todayGoalInput').value.trim();
   const today = todayStr();
@@ -2922,7 +2962,12 @@ function saveTodayGoal(){
   saveState();
   renderGoalQuickPicker();
   updateGoalDisplay();
-  showToast(val ? '挑战目标已保存！加油！' : '目标已清空');
+  if(val){
+    showToast('挑战目标已保存！正在为你打开对应功能…');
+    setTimeout(()=>jumpToGoalTarget(val), 350);   // 稍等让 toast 出现，再跳转
+  } else {
+    showToast('目标已清空');
+  }
 }
 
 function toggleDailyTask(id){
