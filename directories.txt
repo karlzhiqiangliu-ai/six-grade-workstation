@@ -1,0 +1,13 @@
+six‑grade‑workstation/          ← Git仓库根
+├─ obsidian‑vault/              ← Obsidian知识库，纳入Git版本控制
+│   ├─ Projects/
+│   │   └─ six‑grade‑workstation‑notes/   # 本项目的知识笔记、索引、原子笔记
+│   └─ .obsidian/               ← Obsidian配置也git受控（可选）
+├─ prompts/                     # WorkBuddy指令集
+│   ├─ prompt‑全学科六年级工作台.md     # 阅读归档版
+│   └─ prompt‑全学科六年级工作台.txt    # WorkBuddy执行纯文本
+├─ Artifacts/                   # WorkBuddy输出最终HTML成品
+│   └─ 六年级全学科学习工作台.html
+├─ app/                         ✅ WorkBuddy【发布导出】产物目录
+├─ .gitignore                   # ⚠️重点配置
+└─ README.md

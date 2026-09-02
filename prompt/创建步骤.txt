@@ -1,0 +1,71 @@
+## 第一步：GitHub 网页端操作
+
+1. 登录 Github，右上角 New（新建仓库）
+2. Repository name：`six‑grade‑workstation`
+3. Description：六年级语文学习离线工作台｜单文件 HTML 教学工具
+4. **不要勾选 Add a README file**，不要勾选 .gitignore、不要选许可证 → 直接点 Create repository
+
+> 
+> 页面会给出提示：`…or push an existing repository from the command line`，复制这一段命令备用。
+# 进入项目根目录
+cd D:\Workbuddy\six-grade-workstation
+
+# 初始化git仓库（只执行一次）
+git init
+
+
+### 创建 `.gitignore` 文件（关键，防止垃圾文件上传 GitHub）
+
+在项目根新建文件，命名 `.gitignore`，复制下面全部内容
+
+# JS临时检查产物
+_check*.js
+_script*.js
+*.tmp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# Obsidian 不要提交进这个仓库！ vault文件和本代码仓库分离
+.obsidian/
+*.md-journal
+
+# VSCode
+.vscode/
+*.log
+
+# 本地密钥、txt指令（如果你不想公开prompt‑xxx.txt就放开下面一行）
+#prompts/*.txt
+
+
+# JS临时检查产物
+_check*.js
+_script*.js
+*.tmp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# Obsidian 不要提交进这个仓库！ vault文件和本代码仓库分离
+.obsidian/
+*.md-journal
+
+# VSCode
+.vscode/
+*.log
+
+首次提交 & 关联远程
+# 本地密钥、txt指令（如果你不想公开prompt‑xxx.txt就放开下面一行）
+#prompts/*.txt
+
+six-grade-workstation/
+├─ prompts/
+│   ├─ prompt‑六年级成语工作台.md
+│   └─ prompt‑六年级成语工作台.txt
+├─ Artifacts/
+│   └─ 六年级学习工作台.html
+├─ .gitignore
+└─ README.md      # 建议新建，写项目说明
+

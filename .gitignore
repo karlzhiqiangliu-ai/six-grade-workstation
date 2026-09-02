@@ -1,0 +1,55 @@
+# WorkBuddy运行缓存文件夹
+.workbuddy/memory/*.md
+!.workbuddy/memory/MEMORY.md
+.workbuddy/memory/daily/
+
+archive/
+errorbook/
+knowledge/
+lecture/
+site/
+
+#-------- WorkBuddy app发布目录：提交目录本体，但过滤内部运行缓存 --------
+app/**/.workbuddy
+app/**/knowledge
+app/**/errorbook
+app/**/archive
+app/**/_check*.js
+app/**/_script*.js
+app/**/*.tmp
+app/**/*.log
+
+
+
+# Obsidian vault 完全不在此仓库，所以这里不用写.obsidian
+# ========= Obsidian vault：允许提交绝大多数内容，排除缓存 =========
+# vault下面这几类不要git，其余全部跟踪
+obsidian‑vault/.obsidian/Cache/
+obsidian‑vault/.obsidian/Workspace.json
+obsidian‑vault/.obsidian/plugins/*/data/**
+obsidian‑vault/.obsidian/plugins/*/.trash
+obsidian‑vault/.trash/
+obsidian‑vault/**/*.tmp
+obsidian‑vault/**/*.log
+
+
+# 运行时临时脚本产物
+_check*.js
+_script*.js
+*.pyc
+_build*.py
+
+# 临时备份html
+_bak_*.html
+
+
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# vscode
+.vscode/
+*.log
+
+
