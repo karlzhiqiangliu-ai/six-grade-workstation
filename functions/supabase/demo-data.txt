@@ -1,0 +1,7 @@
+username: test001
+plain_password: Test@1234
+real_name: 测试家长
+phone: "13800138000"
+child_name: 小明
+child_grade: 六年级
+remark: 测试注册

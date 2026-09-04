@@ -1,0 +1,9 @@
+{
+  "username":"karl02",
+  "password":"test123456",
+  "real_name":"卡尔",
+  "phone":"13800138000",
+  "child_name":"小明",
+  "child_grade":6,
+  "remark":"六年级学生家长"
+}
