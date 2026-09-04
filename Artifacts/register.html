@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>家长注册</title>
+<style>
+  body{font-family:system-ui,"Microsoft YaHei",sans-serif;max-width:420px;margin:24px auto;padding:0 16px;}
+  h3{margin-bottom:12px;}
+  input{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:9px 10px;
+        border:1px solid #cfd8dc;border-radius:8px;font-size:14px;}
+  button{margin-top:10px;width:100%;padding:10px;border:0;border-radius:8px;
+         background:#2f6fed;color:#fff;font-size:15px;cursor:pointer;}
+  #msg{margin-top:12px;padding:10px;border-radius:8px;background:#f1f5f9;min-height:20px;white-space:pre-wrap;}
+</style>
+</head>
+<body>
+<div>
+  <h3>家长账号注册</h3>
+  <input id="username" placeholder="用户名(字母数字下划线3-32位)">
+  <input id="password" type="password" placeholder="密码至少6位">
+  <input id="real_name" placeholder="真实姓名">
+  <input id="phone" placeholder="手机号">
+  <input id="child_name" placeholder="孩子姓名">
+  <input id="child_grade" type="number" placeholder="孩子年级(数字,如 6)">
+  <input id="remark" placeholder="备注">
+  <button onclick="doReg()">提交注册</button>
+  <div id="msg"></div>
+</div>
+<script>
+//Supabase Edge Function 提交地址；anon 为公开门禁卡，无数据写权限
+const ANON_KEY="sb_publishable_IjJaZfFJwZLu8UNWhSZM1w_kpw0Ysom";
+const WEBHOOK_URL="https://klopmmqxxzlzrsjvwtrc.supabase.co/functions/v1/parent-register";
+
+async function doReg(){
+  const msgDom = document.querySelector("#msg");
+  msgDom.innerText="请求中...";
+  // 收集完整家长资料（与 full_regsiter.js / 后端 parent_profile 表结构一致）
+  const gradeRaw = document.querySelector("#child_grade").value.trim();
+  const payload={
+    username: document.querySelector("#username").value.trim(),
+    password: document.querySelector("#password").value,
+    real_name: document.querySelector("#real_name").value.trim() || null,
+    phone: document.querySelector("#phone").value.trim() || null,
+    child_name: document.querySelector("#child_name").value.trim() || null,
+    child_grade: gradeRaw === "" ? null : Number(gradeRaw),
+    remark: document.querySelector("#remark").value.trim() || null
+  };
+  try{
+    const resp = await fetch(WEBHOOK_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":ANON_KEY,
+        "Authorization":"Bearer "+ANON_KEY
+      },
+      body:JSON.stringify(payload)
+    });
+    const ret = await resp.json();
+    if(ret.ok){
+      msgDom.innerText="✅注册成功 ID:"+ret.id;
+    }else{
+      msgDom.innerText="❌"+ret.error;
+    }
+  }catch(err){
+    msgDom.innerText="网络异常，请检查网络";
+    console.error(err);
+  }
+}
+</script>
+</body>
+</html>

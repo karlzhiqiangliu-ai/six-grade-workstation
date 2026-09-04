@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "postgres‑mcp": {
+      "command": "python",
+      "args": ["D:/Workbuddy/2026-08-23-20-10-40/six‑grade‑workstation/mcp/mcp‑postgres/mcp_server.py"]
+    }
+  }
+}
