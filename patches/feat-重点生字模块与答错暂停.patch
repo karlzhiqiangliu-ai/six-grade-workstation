@@ -1,0 +1,656 @@
+--- a/六年级学习工作台.html
++++ b/六年级学习工作台.html
+@@ -601,6 +601,54 @@
+ .fg-answer-input{font-size:26px;width:160px;text-align:center;padding:8px}
+ .fg-win-box{background:linear-gradient(145deg,#FFF8E1,#FFFDF5);border:2px solid var(--yellow);border-radius:14px;padding:18px;text-align:center;font-size:15px;font-weight:700;margin-top:16px;line-height:2}
+ 
++/* ========== 生字学习模块（自二年级工作台移植）：认读 → 组词 → 拼音填字 → 错字本 ========== */
++.char-block{background:var(--bg);border-radius:14px;padding:14px;margin-bottom:14px}
++.char-secbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
++.char-lesson-name{font-size:15px;font-weight:800;color:var(--cyan)}
++.char-lesson-unit{font-size:11px;color:var(--text2)}
++.char-star{font-weight:800;color:var(--orange)}
++.char-lesson-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
++.char-lesson-tab{padding:6px 12px;border-radius:16px;background:var(--card);color:var(--cyan);font-size:12px;cursor:pointer;border:1.5px solid transparent;transition:.15s}
++.char-lesson-tab:hover{background:var(--cyan-light)}
++.char-lesson-tab.active{background:var(--cyan);color:#fff;font-weight:700}
++.char-progress-wrap{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12px;color:var(--text2)}
++.char-progress-bar{flex:1;height:10px;background:#e3f0ee;border-radius:6px;overflow:hidden}
++.char-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:6px;transition:width .3s}
++.char-page-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin:6px 0 14px}
++.char-page-info{font-size:13px;color:var(--text2);font-weight:700}
++.char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
++.char-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:12px;text-align:center;transition:.2s}
++.char-card.done{border-color:var(--green);background:#e6fff3}
++.char-card.filling{border-color:var(--purple);background:var(--purple-light)}
++.char-type-badge{display:inline-block;font-size:11px;padding:2px 10px;border-radius:10px;color:#fff;margin-bottom:6px}
++.char-type-badge.rec{background:var(--cyan)}
++.char-type-badge.wri{background:var(--purple)}
++.char-big{font-size:50px;font-weight:800;line-height:1.15;color:var(--cyan);cursor:pointer}
++.char-pinyin{font-size:15px;color:var(--orange);font-weight:700;margin:2px 0 6px}
++.char-words{display:flex;justify-content:center;gap:8px;margin:6px 0 8px;flex-wrap:wrap}
++.char-word{background:var(--cyan-light);color:var(--cyan);font-size:12px;padding:3px 10px;border-radius:10px;cursor:pointer;transition:.15s}
++.char-word:hover{background:var(--cyan);color:#fff}
++.char-done-mark{color:var(--green);font-weight:800;font-size:13px;margin-top:6px}
++.char-quiz-q{font-size:16px;font-weight:800;color:#5b4a8a;margin:4px 0 8px}
++.char-quiz-opts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
++.char-quiz-opt{width:44px;height:44px;border-radius:10px;border:2px solid #d8ccf5;background:#fff;font-size:22px;font-weight:700;color:#5b4a8a;cursor:pointer;transition:.15s}
++.char-quiz-opt:hover{border-color:var(--purple);background:var(--purple-light)}
++.char-quiz-opt.right{border-color:var(--green);background:#e6fff3;color:var(--green)}
++.char-quiz-opt.wrong{border-color:var(--red);background:#fff0f0;color:var(--red)}
++.char-quiz-fb{font-size:12px;margin-top:8px;min-height:16px;font-weight:700}
++.char-quiz-fb.ok{color:var(--green)}
++.char-quiz-fb.no{color:var(--red)}
++.char-summary{text-align:center;padding:16px 10px;display:none}
++.char-summary .big{font-size:24px;font-weight:800;color:var(--purple)}
++.char-summary .hint{color:var(--text2);font-size:13px;margin:8px 0 12px}
++.char-wrong-list{font-size:13px;line-height:2;margin-top:6px}
++.char-wrong-chip{display:inline-block;background:#fff0f0;color:var(--red);border-radius:8px;padding:2px 10px;margin:0 6px 6px 0;font-weight:700;cursor:pointer}
++.char-wrong-chip:hover{filter:brightness(.95)}
++@media(max-width:520px){
++  .char-grid{grid-template-columns:repeat(2,1fr);gap:10px}
++  .char-big{font-size:38px}
++}
++
+ /* ========== Responsive ========== */
+ @media(max-width:768px){
+   .sidebar{display:flex;transform:translateX(-100%);transition:transform .25s ease;width:230px;box-shadow:4px 0 24px rgba(0,0,0,.25);padding-top:56px}
+@@ -870,6 +918,7 @@
+       <div class="chinese-tab" data-ctab="idiom">💎 成语百宝箱</div>
+       <div class="chinese-tab" data-ctab="reading">📚 语文阅读站</div>
+       <div class="chinese-tab" data-ctab="vocab">📝 重点生词</div>
++      <div class="chinese-tab" data-ctab="char">🔤 重点生字</div>
+       <div class="chinese-tab" data-ctab="booklog">📖 阅读打卡</div>
+     </div>
+     <div class="chinese-panel active" id="chinese-poetry">
+@@ -925,6 +974,7 @@
+       </div>
+     </div>
+     <div class="chinese-panel" id="chinese-vocab"></div>
++    <div class="chinese-panel" id="chinese-char"></div>
+     <div class="chinese-panel" id="chinese-booklog">
+       <div class="card">
+         <div class="card-title"><span class="emoji">➕</span>记录今天读的书</div>
+@@ -1773,6 +1823,9 @@
+     books:[],
+     readingProgress:{},
+     idiomProgress:{},
++    charLessonIdx:0,      /* 生字学习：当前单元序号 */
++    vocabDone:{},         /* 生字学习：'单元序-字序' -> true 表示已学会 */
++    vocabWrong:[],        /* 生字学习错字本：[{ch, li}] */
+     goalCompleted:{},    // 每日达成的目标 text 标记 {date: text}
+     studyLog:{}          // 学习数据：{ 'YYYY-MM-DD': {sec, correct, wrong, subjects:{}} }
+   };
+@@ -2691,11 +2744,410 @@
+   const panel = document.getElementById('chinese-'+tab);
+   if(panel) panel.classList.add('active');
+   if(tab==='vocab') renderVocab();
++  else if(tab==='char') renderCharTab();
+   if(tab==='poetry') renderPoetry();
+   else if(tab==='idiom') renderIdiom('gallery');
+   else if(tab==='reading') renderReading('practice');
+   else if(tab==='booklog') renderBookLog();
+ }
++/* ================================================================
++   生字学习模块（自二年级学习工作台移植）
++   流程：认读跟读 → 组词理解 → 拼音填字（四选一干扰项）→ 错字本
++   数据：统编版（部编版）语文六年级上册写字表（180 字）
++   ================================================================ */
++const CHAR_PAGE_SIZE = 8;
++const charLessons = [
++  {unit:'第一单元', name:'第一单元 · 草原 / 丁香结 / 古诗词三首', chars:[
++    {ch:'毯',py:'tǎn',type:'写',words:['毛毯','地毯'],dis:['谈','淡','痰']},
++    {ch:'陈',py:'chén',type:'写',words:['陈列','陈旧'],dis:['沉','臣','晨']},
++    {ch:'裳',py:'shang',type:'写',words:['衣裳','红裳'],dis:['常','堂','赏']},
++    {ch:'虹',py:'hóng',type:'写',words:['彩虹','长虹'],dis:['红','江','鸿']},
++    {ch:'蹄',py:'tí',type:'写',words:['马蹄','羊蹄'],dis:['啼','缔','帝']},
++    {ch:'腐',py:'fǔ',type:'写',words:['腐败','豆腐'],dis:['府','俯','腑']},
++    {ch:'稍',py:'shāo',type:'写',words:['稍微','稍等'],dis:['消','梢','悄']},
++    {ch:'微',py:'wēi',type:'写',words:['微笑','微风'],dis:['徽','薇','威']},
++    {ch:'缀',py:'zhuì',type:'写',words:['点缀','连缀'],dis:['辍','掇','啜']},
++    {ch:'幽',py:'yōu',type:'写',words:['清幽','幽静'],dis:['悠','优','幼']},
++    {ch:'雅',py:'yǎ',type:'写',words:['优雅','文雅'],dis:['鸦','芽','讶']},
++    {ch:'案',py:'àn',type:'写',words:['图案','案件'],dis:['按','安','暗']},
++    {ch:'拙',py:'zhuō',type:'写',words:['笨拙','拙劣'],dis:['础','茁','绌']},
++    {ch:'薄',py:'báo',type:'写',words:['单薄','薄片'],dis:['簿','博','搏']},
++    {ch:'糊',py:'hú',type:'写',words:['模糊','糊涂'],dis:['湖','蝴','瑚']},
++    {ch:'蕾',py:'lěi',type:'写',words:['花蕾','苞蕾'],dis:['雷','擂','垒']},
++    {ch:'襟',py:'jīn',type:'写',words:['衣襟','胸襟'],dis:['禁','噤','浸']},
++    {ch:'恍',py:'huǎng',type:'写',words:['恍然','恍惚'],dis:['晃','光','胱']},
++    {ch:'怨',py:'yuàn',type:'写',words:['抱怨','怨恨'],dis:['苑','宛','碗']},
++    {ch:'德',py:'dé',type:'写',words:['品德','美德'],dis:['得','待','特']},
++    {ch:'鹊',py:'què',type:'写',words:['喜鹊','鹊桥'],dis:['雀','却','确']},
++    {ch:'蝉',py:'chán',type:'写',words:['蝉鸣','蝉联'],dis:['禅','婵','阐']}
++  ]},
++  {unit:'第二单元', name:'第二单元 · 七律长征 / 狼牙山五壮士 / 开国大典', chars:[
++    {ch:'律',py:'lǜ',type:'写',words:['规律','纪律'],dis:['津','肆','逮']},
++    {ch:'崖',py:'yá',type:'写',words:['山崖','悬崖'],dis:['涯','睚','捱']},
++    {ch:'渡',py:'dù',type:'写',words:['渡河','过渡'],dis:['度','镀','踱']},
++    {ch:'索',py:'suǒ',type:'写',words:['绳索','搜索'],dis:['锁','琐','嗦']},
++    {ch:'寇',py:'kòu',type:'写',words:['日寇','敌寇'],dis:['冠','蔻','叩']},
++    {ch:'副',py:'fù',type:'写',words:['副手','副食'],dis:['幅','富','福']},
++    {ch:'榴',py:'liú',type:'写',words:['石榴','手榴弹'],dis:['溜','瘤','浏']},
++    {ch:'弹',py:'dàn',type:'写',words:['子弹','炮弹'],dis:['单','掸','惮']},
++    {ch:'抡',py:'lūn',type:'写',words:['抡起','抡拳'],dis:['轮','论','伦']},
++    {ch:'贯',py:'guàn',type:'写',words:['一贯','全神贯注'],dis:['惯','掼','灌']},
++    {ch:'棋',py:'qí',type:'写',words:['下棋','象棋'],dis:['其','期','旗']},
++    {ch:'悬',py:'xuán',type:'写',words:['悬崖','悬挂'],dis:['县','玄','旋']},
++    {ch:'沸',py:'fèi',type:'写',words:['沸腾','沸点'],dis:['佛','拂','费']},
++    {ch:'涧',py:'jiàn',type:'写',words:['山涧','溪涧'],dis:['间','简','锏']},
++    {ch:'雹',py:'báo',type:'写',words:['冰雹','雹子'],dis:['包','饱','抱']},
++    {ch:'屹',py:'yì',type:'写',words:['屹立','屹然'],dis:['乞','吃','迄']},
++    {ch:'悦',py:'yuè',type:'写',words:['喜悦','悦耳'],dis:['说','脱','阅']},
++    {ch:'屈',py:'qū',type:'写',words:['屈服','委屈'],dis:['曲','层','届']},
++    {ch:'政',py:'zhèng',type:'写',words:['政治','政府'],dis:['正','证','征']},
++    {ch:'宾',py:'bīn',type:'写',words:['外宾','宾客'],dis:['滨','缤','鬓']},
++    {ch:'盏',py:'zhǎn',type:'写',words:['灯盏','一盏'],dis:['浅','钱','栈']},
++    {ch:'栏',py:'lán',type:'写',words:['栏杆','护栏'],dis:['拦','兰','烂']},
++    {ch:'汇',py:'huì',type:'写',words:['汇集','汇报'],dis:['会','江','汉']},
++    {ch:'爆',py:'bào',type:'写',words:['爆发','爆炸'],dis:['暴','瀑','曝']},
++    {ch:'宣',py:'xuān',type:'写',words:['宣布','宣传'],dis:['喧','暄','渲']},
++    {ch:'帜',py:'zhì',type:'写',words:['旗帜','独树一帜'],dis:['织','职','识']},
++    {ch:'阅',py:'yuè',type:'写',words:['阅读','检阅'],dis:['悦','说','兑']},
++    {ch:'制',py:'zhì',type:'写',words:['制服','制度'],dis:['致','治','智']},
++    {ch:'坦',py:'tǎn',type:'写',words:['坦克','平坦'],dis:['担','但','袒']},
++    {ch:'距',py:'jù',type:'写',words:['距离','相距'],dis:['拒','矩','巨']},
++    {ch:'隆',py:'lóng',type:'写',words:['隆重','兴隆'],dis:['降','窿','龙']},
++    {ch:'射',py:'shè',type:'写',words:['射击','发射'],dis:['谢','社','设']}
++  ]},
++  {unit:'第三单元', name:'第三单元 · 竹节人 / 宇宙生命之谜', chars:[
++    {ch:'豁',py:'huō',type:'写',words:['豁口','豁出去'],dis:['割','害','谷']},
++    {ch:'凛',py:'lǐn',type:'写',words:['凛冽','威风凛凛'],dis:['禀','檩','林']},
++    {ch:'疙',py:'gē',type:'写',words:['疙瘩'],dis:['吃','屹','乞']},
++    {ch:'瘩',py:'da',type:'写',words:['疙瘩'],dis:['搭','答','塔']},
++    {ch:'棍',py:'gùn',type:'写',words:['木棍','冰棍'],dis:['混','昆','辊']},
++    {ch:'裁',py:'cái',type:'写',words:['裁剪','裁判'],dis:['栽','载','截']},
++    {ch:'筹',py:'chóu',type:'写',words:['筹备','技高一筹'],dis:['寿','涛','畴']},
++    {ch:'橡',py:'xiàng',type:'写',words:['橡皮','橡树'],dis:['象','像','豫']},
++    {ch:'雕',py:'diāo',type:'写',words:['雕刻','雕像'],dis:['凋','碉','周']},
++    {ch:'跺',py:'duò',type:'写',words:['跺脚'],dis:['朵','躲','剁']},
++    {ch:'颓',py:'tuí',type:'写',words:['颓然','颓废'],dis:['秃','腿','退']},
++    {ch:'沮',py:'jǔ',type:'写',words:['沮丧'],dis:['阻','组','咀']},
++    {ch:'趴',py:'pā',type:'写',words:['趴下','趴着'],dis:['扒','八','叭']},
++    {ch:'屉',py:'tì',type:'写',words:['抽屉','笼屉'],dis:['屈','届','层']},
++    {ch:'谜',py:'mí',type:'写',words:['谜语','猜谜'],dis:['迷','眯','醚']},
++    {ch:'尚',py:'shàng',type:'写',words:['高尚','尚且'],dis:['上','淌','敞']},
++    {ch:'氧',py:'yǎng',type:'写',words:['氧气','缺氧'],dis:['养','痒','洋']},
++    {ch:'倾',py:'qīng',type:'写',words:['倾斜','倾听'],dis:['顷','卿','轻']},
++    {ch:'揭',py:'jiē',type:'写',words:['揭开','揭示'],dis:['竭','渴','喝']},
++    {ch:'斑',py:'bān',type:'写',words:['斑点','雀斑'],dis:['班','般','搬']},
++    {ch:'燥',py:'zào',type:'写',words:['干燥','枯燥'],dis:['躁','噪','澡']},
++    {ch:'漠',py:'mò',type:'写',words:['沙漠','冷漠'],dis:['莫','模','摸']},
++    {ch:'磁',py:'cí',type:'写',words:['磁场','磁铁'],dis:['滋','慈','瓷']},
++    {ch:'抵',py:'dǐ',type:'写',words:['抵抗','抵御'],dis:['低','底','砥']},
++    {ch:'御',py:'yù',type:'写',words:['防御','抵御'],dis:['卸','衔','衙']},
++    {ch:'素',py:'sù',type:'写',words:['因素','素材'],dis:['索','速','塑']},
++    {ch:'盗',py:'dào',type:'写',words:['偷盗','海盗'],dis:['道','到','倒']},
++    {ch:'培',py:'péi',type:'写',words:['培养','培训'],dis:['陪','赔','倍']}
++  ]},
++  {unit:'第四单元', name:'第四单元 · 桥 / 穷人', chars:[
++    {ch:'咆',py:'páo',type:'写',words:['咆哮'],dis:['包','炮','袍']},
++    {ch:'哮',py:'xiào',type:'写',words:['咆哮','哮喘'],dis:['孝','教','酵']},
++    {ch:'嗓',py:'sǎng',type:'写',words:['嗓子','嗓音'],dis:['桑','搡','噪']},
++    {ch:'淌',py:'tǎng',type:'写',words:['流淌','淌汗'],dis:['躺','趟','倘']},
++    {ch:'哑',py:'yǎ',type:'写',words:['沙哑','哑巴'],dis:['亚','娅','邪']},
++    {ch:'揪',py:'jiū',type:'写',words:['揪心','揪住'],dis:['秋','愁','锹']},
++    {ch:'呻',py:'shēn',type:'写',words:['呻吟'],dis:['申','伸','绅']},
++    {ch:'废',py:'fèi',type:'写',words:['废弃','作废'],dis:['费','沸','肺']},
++    {ch:'汹',py:'xiōng',type:'写',words:['汹涌'],dis:['凶','匈','胸']},
++    {ch:'涌',py:'yǒng',type:'写',words:['涌现','汹涌'],dis:['勇','蛹','桶']},
++    {ch:'澎',py:'péng',type:'写',words:['澎湃'],dis:['彭','膨','棚']},
++    {ch:'湃',py:'pài',type:'写',words:['澎湃'],dis:['拜','派','掰']},
++    {ch:'熄',py:'xī',type:'写',words:['熄灭','熄灯'],dis:['息','媳','西']},
++    {ch:'掀',py:'xiān',type:'写',words:['掀起','掀开'],dis:['欣','锨','先']},
++    {ch:'困',py:'kùn',type:'写',words:['困难','贫困'],dis:['因','捆','闲']},
++    {ch:'唉',py:'āi',type:'写',words:['唉声叹气'],dis:['挨','埃','爱']},
++    {ch:'淋',py:'lín',type:'写',words:['淋雨','湿淋淋'],dis:['林','琳','霖']},
++    {ch:'嘿',py:'hēi',type:'写',words:['嘿嘿'],dis:['黑','嗨','海']},
++    {ch:'糟',py:'zāo',type:'写',words:['糟糕','糟蹋'],dis:['遭','槽','曹']},
++    {ch:'嘛',py:'ma',type:'写',words:['干嘛'],dis:['吗','妈','麻']},
++    {ch:'皱',py:'zhòu',type:'写',words:['皱纹','皱眉'],dis:['邹','绉','雏']},
++    {ch:'勺',py:'sháo',type:'写',words:['勺子','饭勺'],dis:['句','匀','芍']}
++  ]},
++  {unit:'第五单元', name:'第五单元 · 夏天里的成长 / 盼', chars:[
++    {ch:'棚',py:'péng',type:'写',words:['棚架','草棚'],dis:['朋','鹏','硼']},
++    {ch:'苔',py:'tái',type:'写',words:['苔藓','青苔'],dis:['台','抬','胎']},
++    {ch:'藓',py:'xiǎn',type:'写',words:['苔藓'],dis:['鲜','癣','先']},
++    {ch:'坪',py:'píng',type:'写',words:['草坪','坪坝'],dis:['平','评','苹']},
++    {ch:'蔗',py:'zhè',type:'写',words:['甘蔗','蔗糖'],dis:['遮','庶','这']},
++    {ch:'瀑',py:'pù',type:'写',words:['瀑布','飞瀑'],dis:['暴','爆','曝']},
++    {ch:'增',py:'zēng',type:'写',words:['增加','增长'],dis:['曾','赠','憎']},
++    {ch:'缝',py:'fèng',type:'写',words:['缝隙','门缝'],dis:['逢','锋','蜂']},
++    {ch:'谚',py:'yàn',type:'写',words:['谚语','农谚'],dis:['彦','颜','严']},
++    {ch:'袖',py:'xiù',type:'写',words:['袖子','领袖'],dis:['秀','绣','锈']},
++    {ch:'篷',py:'péng',type:'写',words:['斗篷','帐篷'],dis:['蓬','逢','缝']},
++    {ch:'缩',py:'suō',type:'写',words:['缩小','退缩'],dis:['宿','搜','嗦']},
++    {ch:'疯',py:'fēng',type:'写',words:['疯狂','发疯'],dis:['风','枫','讽']},
++    {ch:'瓦',py:'wǎ',type:'写',words:['瓦片','瓦蓝'],dis:['互','瓶','瓮']},
++    {ch:'柜',py:'guì',type:'写',words:['衣柜','书柜'],dis:['巨','拒','矩']},
++    {ch:'喧',py:'xuān',type:'写',words:['喧闹','喧哗'],dis:['宣','渲','暄']},
++    {ch:'甩',py:'shuǎi',type:'写',words:['甩手','甩掉'],dis:['用','帅','摔']},
++    {ch:'嚷',py:'rǎng',type:'写',words:['叫嚷','嚷嚷'],dis:['壤','攘','瓤']},
++    {ch:'酱',py:'jiàng',type:'写',words:['酱油','酱菜'],dis:['将','奖','浆']},
++    {ch:'唇',py:'chún',type:'写',words:['嘴唇','唇齿'],dis:['辰','晨','辱']},
++    {ch:'蹦',py:'bèng',type:'写',words:['蹦跳','蹦床'],dis:['崩','绷','泵']},
++    {ch:'梯',py:'tī',type:'写',words:['楼梯','电梯'],dis:['弟','第','涕']}
++  ]},
++  {unit:'第六单元', name:'第六单元 · 古诗三首 / 只有一个地球', chars:[
++    {ch:'涯',py:'yá',type:'写',words:['天涯','生涯'],dis:['崖','睚','洼']},
++    {ch:'莺',py:'yīng',type:'写',words:['黄莺','夜莺'],dis:['英','鹰','樱']},
++    {ch:'莹',py:'yíng',type:'写',words:['晶莹','莹白'],dis:['营','萤','荧']},
++    {ch:'裹',py:'guǒ',type:'写',words:['包裹','裹住'],dis:['果','棵','裸']},
++    {ch:'篮',py:'lán',type:'写',words:['摇篮','篮球'],dis:['蓝','滥','览']},
++    {ch:'蔼',py:'ǎi',type:'写',words:['和蔼','蔼然'],dis:['揭','渴','霭']},
++    {ch:'资',py:'zī',type:'写',words:['资源','资料'],dis:['姿','咨','兹']},
++    {ch:'矿',py:'kuàng',type:'写',words:['矿产','矿石'],dis:['广','旷','扩']},
++    {ch:'慷',py:'kāng',type:'写',words:['慷慨'],dis:['康','糠','扛']},
++    {ch:'慨',py:'kǎi',type:'写',words:['慷慨','感慨'],dis:['概','溉','既']},
++    {ch:'贡',py:'gòng',type:'写',words:['贡献','进贡'],dis:['工','公','供']},
++    {ch:'滥',py:'làn',type:'写',words:['滥用','泛滥'],dis:['蓝','篮','监']},
++    {ch:'基',py:'jī',type:'写',words:['基础','基本'],dis:['其','期','箕']},
++    {ch:'睹',py:'dǔ',type:'写',words:['目睹','睹物思人'],dis:['堵','赌','都']}
++  ]},
++  {unit:'第七单元', name:'第七单元 · 文言文二则 / 月光曲', chars:[
++    {ch:'哉',py:'zāi',type:'写',words:['善哉','壮哉'],dis:['栽','载','截']},
++    {ch:'巍',py:'wēi',type:'写',words:['巍峨','巍然'],dis:['魏','威','危']},
++    {ch:'弦',py:'xián',type:'写',words:['琴弦','弦外之音'],dis:['玄','舷','眩']},
++    {ch:'轴',py:'zhóu',type:'写',words:['轴心','车轴'],dis:['油','抽','由']},
++    {ch:'锦',py:'jǐn',type:'写',words:['锦绣','锦缎'],dis:['棉','绵','帛']},
++    {ch:'曝',py:'pù',type:'写',words:['曝晒','一曝十寒'],dis:['暴','爆','瀑']},
++    {ch:'矣',py:'yǐ',type:'写',words:['悔之晚矣'],dis:['唉','挨','埃']},
++    {ch:'谱',py:'pǔ',type:'写',words:['乐谱','谱写'],dis:['普','朴','扑']},
++    {ch:'莱',py:'lái',type:'写',words:['蓬莱','莱茵河'],dis:['来','菜','睬']},
++    {ch:'茵',py:'yīn',type:'写',words:['绿草如茵','莱茵河'],dis:['因','菌','姻']},
++    {ch:'盲',py:'máng',type:'写',words:['盲人','盲目'],dis:['忙','芒','茫']},
++    {ch:'纯',py:'chún',type:'写',words:['纯熟','纯洁'],dis:['屯','吨','钝']},
++    {ch:'键',py:'jiàn',type:'写',words:['琴键','关键'],dis:['建','健','毽']},
++    {ch:'缕',py:'lǚ',type:'写',words:['一缕','千丝万缕'],dis:['楼','搂','篓']},
++    {ch:'陶',py:'táo',type:'写',words:['陶醉','陶器'],dis:['淘','掏','萄']}
++  ]},
++  {unit:'第八单元', name:'第八单元 · 少年闰土 / 好的故事', chars:[
++    {ch:'郑',py:'zhèng',type:'写',words:['郑重','郑州'],dis:['关','送','朕']},
++    {ch:'拜',py:'bài',type:'写',words:['拜访','拜年'],dis:['白','掰','湃']},
++    {ch:'租',py:'zū',type:'写',words:['租金','出租'],dis:['组','阻','祖']},
++    {ch:'厨',py:'chú',type:'写',words:['厨房','厨师'],dis:['橱','锄','雏']},
++    {ch:'毡',py:'zhān',type:'写',words:['毡帽','毡靴'],dis:['占','沾','粘']},
++    {ch:'羞',py:'xiū',type:'写',words:['害羞','羞涩'],dis:['差','着','秀']},
++    {ch:'撒',py:'sā',type:'写',words:['撒种','播撒'],dis:['散','撤','澈']},
++    {ch:'缚',py:'fù',type:'写',words:['束缚','绑缚'],dis:['博','搏','薄']},
++    {ch:'猬',py:'wèi',type:'写',words:['刺猬'],dis:['胃','谓','渭']},
++    {ch:'伶',py:'líng',type:'写',words:['伶俐'],dis:['令','铃','玲']},
++    {ch:'俐',py:'lì',type:'写',words:['伶俐'],dis:['利','莉','梨']},
++    {ch:'窜',py:'cuàn',type:'写',words:['逃窜','流窜'],dis:['串','蹿','撺']},
++    {ch:'搁',py:'gē',type:'写',words:['搁置','搁下'],dis:['阁','隔','格']},
++    {ch:'综',py:'zōng',type:'写',words:['综合','错综'],dis:['宗','棕','踪']},
++    {ch:'澄',py:'chéng',type:'写',words:['澄澈','澄清'],dis:['橙','登','凳']},
++    {ch:'萍',py:'píng',type:'写',words:['浮萍','萍藻'],dis:['平','苹','评']},
++    {ch:'藻',py:'zǎo',type:'写',words:['海藻','萍藻'],dis:['澡','燥','躁']},
++    {ch:'漾',py:'yàng',type:'写',words:['荡漾'],dis:['样','恙','洋']},
++    {ch:'焰',py:'yàn',type:'写',words:['火焰','气焰'],dis:['陷','馅','阎']},
++    {ch:'削',py:'xuē',type:'写',words:['剥削','削弱'],dis:['消','销','霄']},
++    {ch:'瞬',py:'shùn',type:'写',words:['瞬间','瞬时'],dis:['舜','顺','眨']},
++    {ch:'凝',py:'níng',type:'写',words:['凝视','凝神'],dis:['疑','宁','拧']},
++    {ch:'骤',py:'zhòu',type:'写',words:['骤然','步骤'],dis:['聚','取','娶']},
++    {ch:'掷',py:'zhì',type:'写',words:['投掷','孤注一掷'],dis:['郑','智','知']},
++    {ch:'陡',py:'dǒu',type:'写',words:['陡峭','陡坡'],dis:['斗','抖','徒']}
++  ]}
++];
++
++let curCharLesson = 0;
++let curCharPage = 0;
++let charQuizActive = {};               // gi -> {options:[...], answered:bool}
++function charKey(li, gi){ return li + '-' + gi; }
++function charIsDone(li, gi){ return !!(state.vocabDone && state.vocabDone[charKey(li, gi)]); }
++function charLessonChars(){ return charLessons[curCharLesson].chars; }
++function charPageCount(){ return Math.ceil(charLessonChars().length / CHAR_PAGE_SIZE); }
++
++function renderCharTab(){
++  const el = document.getElementById('chinese-char');
++  if(!el) return;
++  if(!state.vocabDone) state.vocabDone = {};
++  if(!state.vocabWrong) state.vocabWrong = [];
++  curCharLesson = Math.min(state.charLessonIdx || 0, charLessons.length - 1);
++  el.innerHTML = `
++    <div class="char-block">
++      <div class="card-title"><span class="emoji">🔤</span>重点生字<span style="font-size:12px;font-weight:400;color:var(--text2);margin-left:8px">按单元分组 · 认读跟读 → 组词 → 拼音填字 · 一页 8 字</span></div>
++      <div class="char-secbar">
++        <div>
++          <div class="char-lesson-name" id="charLessonName"></div>
++          <div class="char-lesson-unit" id="charLessonUnit"></div>
++        </div>
++        <div class="char-star">⭐ <span id="charStarCount">0</span> 颗星</div>
++      </div>
++      <div class="char-lesson-tabs" id="charLessonTabs"></div>
++      <div class="char-progress-wrap">
++        <span>本页进度</span>
++        <div class="char-progress-bar"><div class="char-progress-fill" id="charProgressFill" style="width:0%"></div></div>
++        <span id="charProgressText">0/8</span>
++      </div>
++      <div class="char-page-nav">
++        <button class="btn btn-outline" id="charBtnPrev">⬅ 上一页</button>
++        <span class="char-page-info" id="charPageInfo"></span>
++        <button class="btn btn-primary" id="charBtnNext">下一页 ➡</button>
++      </div>
++      <div class="char-grid" id="charGrid"></div>
++      <div class="char-summary" id="charPageSummary">
++        <div class="big" id="charSummaryText"></div>
++        <div class="hint" id="charSummaryHint"></div>
++        <button class="btn btn-primary" id="charBtnNextLesson">进入下一课 ➡</button>
++      </div>
++      <div class="card-title" style="margin-top:14px">❌ 我的错字本 <small style="font-size:12px;font-weight:400;color:var(--text2)">填字答错的字，点一下回到那个单元重练</small></div>
++      <div class="char-wrong-list" id="charWrongList">还没有错字，继续加油！</div>
++    </div>`;
++  document.getElementById('charBtnPrev').onclick = ()=>{ if(curCharPage>0){ curCharPage--; charQuizActive={}; renderCharStudy(); } };
++  document.getElementById('charBtnNext').onclick = ()=>{ if(curCharPage < charPageCount()-1){ curCharPage++; charQuizActive={}; renderCharStudy(); } };
++  renderCharStudy();
++}
++
++function renderCharStudy(){
++  const tabsEl = document.getElementById('charLessonTabs');
++  if(!tabsEl) return;
++  tabsEl.innerHTML = charLessons.map((l,i)=>`<div class="char-lesson-tab ${i===curCharLesson?'active':''}" onclick="charPickLesson(${i})">${l.unit}</div>`).join('');
++  document.getElementById('charLessonName').textContent = charLessons[curCharLesson].name;
++  document.getElementById('charLessonUnit').textContent = charLessons[curCharLesson].unit + ' · 共 ' + charLessonChars().length + ' 个字 · ' + charPageCount() + ' 页';
++  document.getElementById('charStarCount').textContent = state.stars;
++
++  const chars = charLessonChars();
++  const start = curCharPage * CHAR_PAGE_SIZE;
++  const pageChars = chars.slice(start, start + CHAR_PAGE_SIZE);
++  document.getElementById('charPageInfo').textContent = '第 ' + (curCharPage+1) + ' / ' + charPageCount() + ' 页';
++  document.getElementById('charBtnPrev').disabled = curCharPage === 0;
++  document.getElementById('charBtnNext').disabled = curCharPage >= charPageCount() - 1;
++
++  const grid = document.getElementById('charGrid');
++  grid.innerHTML = pageChars.map((c,i)=>{
++    const gi = start + i;
++    if(charIsDone(curCharLesson, gi)){
++      return `<div class="char-card done">
++        <span class="char-type-badge ${c.type==='写'?'wri':'rec'}">${c.type==='写'?'会写字':'会认字'}</span>
++        <div class="char-big">${c.ch}</div>
++        <div class="char-pinyin">${c.py}</div>
++        <div class="char-words">${c.words.map(w=>`<span class="char-word" onclick="speak('${w}','zh-CN')">${w} 🔊</span>`).join('')}</div>
++        <div class="char-done-mark">✓ 已学会</div>
++      </div>`;
++    }
++    if(c.type !== '写'){
++      return `<div class="char-card">
++        <span class="char-type-badge rec">会认字</span>
++        <div class="char-big" onclick="speak('${c.ch}','zh-CN')">${c.ch} 🔊</div>
++        <div class="char-pinyin">${c.py}</div>
++        <div class="char-words">${c.words.map(w=>`<span class="char-word" onclick="speak('${w}','zh-CN')">${w} 🔊</span>`).join('')}</div>
++        <button class="btn btn-primary" onclick="charFinishRead(${gi})">我会读了 ✓</button>
++      </div>`;
++    }
++    if(charQuizActive[gi]) return charQuizCard(c, gi);
++    return `<div class="char-card">
++      <span class="char-type-badge wri">会写字</span>
++      <div class="char-big" onclick="speak('${c.ch}','zh-CN')">${c.ch} 🔊</div>
++      <div class="char-pinyin">${c.py}</div>
++      <div class="char-words">${c.words.map(w=>`<span class="char-word" onclick="speak('${w}','zh-CN')">${w} 🔊</span>`).join('')}</div>
++      <button class="btn btn-primary" onclick="charFinishRead(${gi})">我会读了 → 去填字</button>
++    </div>`;
++  }).join('');
++
++  const total = pageChars.length;
++  let done = 0;
++  pageChars.forEach((c,i)=>{ if(charIsDone(curCharLesson, start+i)) done++; });
++  document.getElementById('charProgressFill').style.width = (total? Math.round(done/total*100):0) + '%';
++  document.getElementById('charProgressText').textContent = done + '/' + total;
++
++  const summary = document.getElementById('charPageSummary');
++  if(done === total && total > 0){
++    summary.style.display = 'block';
++    document.getElementById('charSummaryText').textContent = '🎉 本页 ' + total + ' 个字全部学会！';
++    const hasNext = curCharPage < charPageCount()-1;
++    const btn = document.getElementById('charBtnNextLesson');
++    if(hasNext){ btn.textContent='下一页 ➡'; btn.onclick=()=>{ curCharPage++; charQuizActive={}; renderCharStudy(); }; }
++    else if(curCharLesson < charLessons.length-1){ btn.textContent='进入下一单元 ➡'; btn.onclick=()=>{ charPickLesson(curCharLesson+1); }; }
++    else { btn.textContent='已是最后一个单元 🎊'; btn.onclick=null; btn.disabled=true; }
++    document.getElementById('charSummaryHint').textContent = hasNext ? '翻到下一页继续学' : (curCharLesson < charLessons.length-1 ? charLessons[curCharLesson+1].unit+' 在等你' : '太棒了，全部学完！');
++  } else {
++    summary.style.display = 'none';
++  }
++  renderCharWrongList();
++}
++
++/* 第一步：认读跟读 → 会写字进入拼音填字，会认字直接标记学会 */
++function charFinishRead(gi){
++  const c = charLessonChars()[gi];
++  speak(c.ch, 'zh-CN');
++  setTimeout(()=>{ c.words.forEach(w=>speak(w,'zh-CN')); }, 350);
++  if(c.type === '写'){ charQuizActive[gi] = charBuildQuiz(c); }
++  else { charMarkDone(gi); }
++  renderCharStudy();
++}
++/* 四候选：1 正确 + 3 形近/同音干扰，顺序打乱 */
++function charBuildQuiz(c){
++  const opts = [c.ch].concat(c.dis || []).slice(0,4);
++  while(opts.length < 4){ opts.push('？'); }
++  for(let i=opts.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=opts[i];opts[i]=opts[j];opts[j]=t; }
++  return {options:opts, answered:false};
++}
++function charQuizCard(c, gi){
++  const q = charQuizActive[gi];
++  return `<div class="char-card filling">
++    <span class="char-type-badge wri">拼音填字</span>
++    <div class="char-quiz-q">${c.py}（　）</div>
++    <div class="char-words">${c.words.map(w=>`<span class="char-word" onclick="speak('${w}','zh-CN')">${w} 🔊</span>`).join('')}</div>
++    <div class="char-quiz-opts">
++      ${q.options.map(o=>`<button class="char-quiz-opt" onclick="charAnswerQuiz(${gi},'${o}',this)">${o}</button>`).join('')}
++    </div>
++    <div class="char-quiz-fb" id="charFb-${gi}"></div>
++  </div>`;
++}
++function charAnswerQuiz(gi, ch, btn){
++  const c = charLessonChars()[gi];
++  const q = charQuizActive[gi];
++  if(!q || q.answered) return;
++  const fb = document.getElementById('charFb-'+gi);
++  if(ch === c.ch){
++    q.answered = true;
++    btn.classList.add('right');
++    if(fb){ fb.textContent = '✓ 正确！' + c.ch + ' ' + c.words[0]; fb.className = 'char-quiz-fb ok'; }
++    addStars(1);
++    setTimeout(()=>{ charMarkDone(gi); renderCharStudy(); }, 900);
++  } else {
++    btn.classList.add('wrong');
++    btn.disabled = true;
++    if(fb){ fb.textContent = '✗ 再想想，正确答案先不告诉你～'; fb.className = 'char-quiz-fb no'; }
++    charAddWrong(c.ch, curCharLesson);
++    saveState();
++    renderCharWrongList();
++  }
++}
++function charMarkDone(gi){
++  state.vocabDone[charKey(curCharLesson, gi)] = true;
++  saveState();
++}
++function charPickLesson(i){
++  curCharLesson = i; curCharPage = 0; charQuizActive = {};
++  state.charLessonIdx = i; saveState();
++  renderCharStudy();
++}
++function charAddWrong(ch, li){
++  state.vocabWrong = state.vocabWrong || [];
++  if(!state.vocabWrong.some(x=>x.ch===ch && x.li===li)) state.vocabWrong.push({ch, li});
++}
++function charJumpWrong(li){
++  curCharLesson = li; curCharPage = 0; charQuizActive = {};
++  state.charLessonIdx = li; saveState();
++  renderCharStudy();
++}
++function charClearWrong(){ state.vocabWrong = []; saveState(); renderCharWrongList(); }
++function renderCharWrongList(){
++  const el = document.getElementById('charWrongList');
++  if(!el) return;
++  const wrong = state.vocabWrong || [];
++  if(!wrong.length){ el.innerHTML = '<span style="color:var(--text2)">还没有错字，继续加油！</span>'; return; }
++  el.innerHTML = wrong.map(x=>`<span class="char-wrong-chip" onclick="charJumpWrong(${x.li})">${x.ch}</span>`).join('') +
++    `<button class="btn btn-outline" style="margin-left:8px" onclick="charClearWrong()">清空错字本</button>`;
++}
++
+ document.querySelectorAll('#chineseTabs .chinese-tab').forEach(t=>{
+   t.addEventListener('click', ()=>switchChineseTab(t.dataset.ctab));
+ });
+@@ -3145,7 +3597,9 @@
+   nextSpellWord();
+ }
+ 
++let spellLocked = false;            /* 判过答案后锁定，等孩子点「下一题」 */
+ function nextSpellWord(){
++  spellLocked = false;
+   const allWords = [];
+   Object.values(englishWords).forEach(arr=>arr.forEach(w=>allWords.push(w)));
+   spellCurrent = allWords[Math.floor(Math.random()*allWords.length)];
+@@ -3175,21 +3629,37 @@
+ }
+ 
+ function checkSpell(){
+-  const input = document.getElementById('spellInput').value.trim().toLowerCase();
++  if(spellLocked) return;            /* 已判过，等点「下一题」 */
++  const inputEl = document.getElementById('spellInput');
++  const input = inputEl.value.trim().toLowerCase();
++  if(!input) return;                 /* 空着不判 */
++  spellLocked = true;
++  inputEl.disabled = true;
+   spellTotal++;
+   const result = document.getElementById('spellResult');
+-  if(input === spellCurrent.en.toLowerCase()){
++  const isRight = (input === spellCurrent.en.toLowerCase());
++  const nextBtnHTML = '<div class="tc mt12"><button class="btn btn-primary" style="min-height:48px;padding:0 26px" '
++    + `onclick="nextSpellWord()">${isRight ? '下一题 ➡️' : '我知道了，下一题 ➡️'}</button></div>`;
++  if(isRight){
+     spellScore++;
+     state.progress.english.correct++;
+     addStars(2);
+     result.innerHTML = '<div class="result-display result-correct">太棒了！+2 ⭐</div>';
+   } else {
+-    result.innerHTML = `<div class="result-display result-wrong">正确答案：${spellCurrent.en}</div>`;
++    /* 答错暂停：把正确拼写和中文一起看清再走 */
++    result.innerHTML = `<div class="result-display result-wrong">正确答案：${spellCurrent.en}</div>`
++      + `<div class="tc" style="font-size:16px;font-weight:700;margin:8px 0">📖 ${spellCurrent.en} = ${spellCurrent.zh}</div>`
++      + '<div class="hint-text tc">拼错的单词要看清楚哦～</div>';
++    addErrorAuto(spellCurrent.en+' '+spellCurrent.zh, '英语', '单词拼写', '拼写错误');
+   }
+   state.progress.english.gamesPlayed++;
+   saveState();
+   checkBadges();
+-  setTimeout(nextSpellWord, 1500);
++  result.innerHTML += nextBtnHTML;
++  const sd = document.getElementById('spellScoreDisplay');
++  const td = document.getElementById('spellTotalDisplay');
++  if(sd) sd.textContent = spellScore;
++  if(td) td.textContent = spellTotal;
+ }
+ 
+ let matchPairs = [];
+@@ -5190,6 +5660,7 @@
+ function nextReviewProblem(){
+   const game = document.getElementById('mathGame');
+   if(!game || !reviewSession) return;
++  mathAnswerLocked = false;
+   const problem = genMathProblem(reviewSession.type);
+   game.innerHTML = `
+     <div class="tc" style="font-size:13px;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+@@ -5649,9 +6120,11 @@
+   return {q, ans, options};
+ }
+ 
++let mathAnswerLocked = false;   /* 判过答案后锁定，等孩子点「下一题」 */
+ function nextMathProblem(type, practice){
+   const game = document.getElementById('mathGame');
+   if(!game) return;
++  mathAnswerLocked = false;
+   const problem = genMathProblem(type);
+   let flagHTML = '';
+   if(practice && mathPractice){
+@@ -5675,8 +6148,15 @@
+ }
+ 
+ function checkMathAnswer(selected, correct, btn, type){
++  if(mathAnswerLocked) return;      /* 已判过，等点「下一题」，防止改答案/重复点击 */
++  mathAnswerLocked = true;
+   mathTotal++;
+   const result = document.getElementById('mathResult');
++  /* 锁定其余选项，避免孩子发现选错后马上改答案 */
++  btn.parentNode.querySelectorAll('.math-option').forEach(o=>{
++    if(o !== btn) o.classList.add('locked');
++  });
++  const isRight = (String(selected) === String(correct));
+   /* 是否正在"同类题练习"状态 */
+   const inPractice = !!(mathPractice && mathPractice.type === type && !reviewSession && !mathTimedTimer);
+   if(inPractice) mathPractice.done++;
+@@ -5716,20 +6196,35 @@
+   saveState();
+   checkBadges();
+   
+-  if(!mathTimedTimer || mathTimedSeconds > 0){
+-    setTimeout(()=>{
+-      if(reviewSession){ nextReviewProblem(); }
+-      else if(mathTimedTimer){ nextTimedProblem(); }
+-      else if(mathPractice && mathPractice.done < mathPractice.total){
+-        nextMathProblem(mathPractice.type, true);   /* 继续同类题练习 */
+-      }
+-      else if(mathPractice && mathPractice.done >= mathPractice.total){
+-        mathPractice = null;                        /* 3题练完，恢复正常出题 */
+-        nextMathProblem(type);
+-      }
+-      else { nextMathProblem(type); }
+-    }, 1200);
+-  }
++  /* 「下一题」按钮：答错一律暂停，必须点按钮才继续（同古诗填空背诵） */
++  const nextBtnHTML = '<div class="tc mt12"><button class="btn btn-primary" style="min-height:48px;padding:0 26px" '
++    + `onclick="mathNextStep('${type}')">${isRight ? '下一题 ➡️' : '我知道了，下一题 ➡️'}</button></div>`;
++
++  if(isRight){
++    /* 计时挑战：答对保持快速连答，不打断节奏 */
++    if(mathTimedTimer && mathTimedSeconds > 0){
++      setTimeout(()=>mathNextStep(type), 700);
++    } else {
++      result.innerHTML += nextBtnHTML;
++    }
++  } else {
++    result.innerHTML += nextBtnHTML;   /* 答错：停下来看清正确答案再走 */
++  }
++}
++
++/* 手动推进下一题（「下一题」按钮用）：内部保持插旗练习/复习/计时的路由 */
++function mathNextStep(type){
++  if(mathTimedTimer && mathTimedSeconds <= 0) return;   /* 计时挑战时间到，不再出题 */
++  if(reviewSession){ nextReviewProblem(); }
++  else if(mathTimedTimer){ nextTimedProblem(); }
++  else if(mathPractice && mathPractice.done < mathPractice.total){
++    nextMathProblem(mathPractice.type, true);           /* 继续同类题练习 */
++  }
++  else if(mathPractice && mathPractice.done >= mathPractice.total){
++    mathPractice = null;                                /* 3题练完，恢复正常出题 */
++    nextMathProblem(type);
++  }
++  else { nextMathProblem(type); }
+ }
+ 
+ /* ================================================================
+@@ -6320,11 +6815,18 @@
+   saveState();
+   checkBadges();
+   s.idx++;
+-  setTimeout(()=>{
+-    if(redoSession !== s) return;
+-    if(s.idx >= s.items.length) finishRedo();
+-    else renderRedoItem();
+-  }, 1500);
++  /* 答完不自动跳走：点「下一题 / 我知道了」才继续，答错有时间看清正确答案 */
++  if(res){
++    res.innerHTML += '<div class="tc mt12"><button class="btn btn-primary" style="min-height:48px;padding:0 26px" '
++      + `onclick="redoNextStep()">${String(selected) === String(correct) ? '下一题 ➡️' : '我知道了，下一题 ➡️'}</button></div>`;
++  }
++}
++
++function redoNextStep(){
++  const s = redoSession;
++  if(!s) return;
++  if(s.idx >= s.items.length) finishRedo();
++  else renderRedoItem();
+ }
+ 
+ function redoMasterCard(errId, willMaster){
