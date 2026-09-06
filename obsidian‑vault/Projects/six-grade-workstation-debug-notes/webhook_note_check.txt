@@ -1,0 +1,15 @@
+已交付
+1. functions/web_parent_register.js —— 真正跑在 Webhook 里的处理器（已 node --check 通过）：
+
+收 POST {username, password}，开 CORS 预检、做入参校验（用户名 3–32 位、密码 ≥6）
+本地 bcryptjs 哈希（cost=4，与你现有 $2b$04$ 哈希互验），明文只在内存，不落库
+用 service_role POST 写 parent_profile，返回 {ok:true,message,id} 或友好错误（重复用户名 / 权限不足 / 约束错误已归类）
+密钥从 process.env.SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY 读，不写进代码、不进前端
+2. prompt/webhook_wiring.md —— 接线说明：WorkBuddy UI 建工作流步骤、最小 H5 表单、请求/响应约定、安全注意。
+
+关于「新建工作流 + Webhook 触发器」
+我得跟你说实话：这个 agent 会话没有能直接创建 WorkBuddy 公开 HTTP Webhook 触发器的工具（automation_update 只管定时/一次性任务，不是外部 HTTP 触发）。所以「点一下建出公开 Webhook 地址」这一步要在 WorkBuddy 界面里手动做（触发器选 HTTP Webhook、POST、开 CORS、JSON），然后把我的 web_parent_register.js 作为「运行代码」步骤粘进去即可。除了那两下点击，其余逻辑我都备齐了。
+
+还差你两样才能跑通
+SUPABASE_SERVICE_ROLE_KEY —— 你表已对 anon/authenticated REVOKE，唯一能写的就是 service_role。把它配到工作流的「密钥/环境变量」里（别给我明文也行，只要在 WorkBuddy 工作流侧配好即可）。
+H5 是否收集完整资料列 —— 你给的契约只有 username+password，那 real_name/phone/child_name/child_grade/remark 会写成 NULL。如果这几列有 NOT NULL 约束，插入会失败。请确认：是「仅凭证、其余后补」，还是「表单也收这 5 个字段」？若后者，我把它们也加进入参校验和 payload。

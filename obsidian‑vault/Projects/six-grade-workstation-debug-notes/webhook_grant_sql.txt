@@ -1,0 +1,27 @@
+自检结论（链路已验证到最后一环，只差一个授权）
+你确认得对——SUPABASE_SERVICE_ROLE_KEY 确实在环境变量里了（SR_HEAD=sb_sec，长度 41）。我用它实跑了 web_parent_register.js，结果非常有信息量：
+
+环节	状态
+处理器加载、CORS、入参校验	✅
+bcryptjs 本地哈希（明文不出函数）	✅
+携带 service_role key 请求 Supabase	✅ 到达了（证明 URL+key 传递正确）
+写入 parent_profile	❌ 42501 — permission denied，提示 GRANT ... TO service_role
+读回/校验/清理	因未插入，跳过
+关键点：请求已经正确打到 Supabase 并被识别，只是数据库层面 service_role 这张表没授权。这恰好印证了你「anon/authenticated 全 REVOKE」的加固生效了，现在只差把写权限交给 service_role（唯一的、正确的、服务端专属的通道）。
+
+你需要做一步
+在 Supabase SQL Editor 执行我刚生成的 prompt/grant_service_role_parent_profile.sql（只一条 GRANT，外加一段确认查询，不含任何密钥）。执行后立即回我「已授权」，我重跑上面的自检——预期：插入返回 200 → 读回校验密码哈希通过 → 删掉测试行（不留垃圾）。
+
+sql
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.parent_profile TO service_role;
+这是该安全模型的终态：公开 REST（anon/authenticated）完全碰不到这张表，只有持 service_role 密钥的 WorkBuddy Webhook 能写。
+
+另两个提醒（不影响本次，但上线前必须）
+Webhook 里 process.env 的归属：我这个沙箱读的是你的 Windows 用户环境变量；但真实的 WorkBuddy Webhook 跑在 WorkBuddy 云端，它读的是该工作流自己的「密钥/环境变量」配置。请确认在 WorkBuddy 建「web‑家长注册接收」工作流时，把 SUPABASE_URL 和 SUPABASE_SERVICE_ROLE_KEY 配进工作流的 env（光在 Windows 本地设不够）。
+公开 Webhook 触发器仍需你在 WorkBuddy UI 手动建：本会话没有创建 HTTP Webhook 的工具，functions/web_parent_register.js 已备好，建完触发器后作为「运行代码」步骤粘入即可（接线见 prompt/webhook_wiring.md）。
+先去执行授权 SQL，回来我立刻复测整条链路。
+
+授权 SQL 与 Webhook 处理器已交付（见上方两个文件卡片）。
+
+一句话总结：SUPABASE_SERVICE_ROLE_KEY 确认已就绪；我用它实跑处理器证明「请求格式/URL/哈希/跨域全对，只卡在数据库没给 service_role 授权」——你执行 grant_service_role_parent_profile.sql 后回我「已授权」，我立刻重跑自检（插入→读回校验→清理测试行）验证整条链路闭环。

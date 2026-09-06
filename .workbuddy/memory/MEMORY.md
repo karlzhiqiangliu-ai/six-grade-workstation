@@ -87,6 +87,13 @@
 - `flushStudySession()` 切模块/visibilitychange隐藏/beforeunload 落盘；`subjectOfSection(name)` 映射模块→学科
 - 数据管理页 `renderStudyStats()` 纯 SVG：近7天时长**柱状图** + **当天(今天)答对/答错柱状图** + **近7天正确率折线图**(`renderLine` 画 polyline) + `renderPie` 两个饼图（学科时长占比 / 正确错误占比）；`todayKey()`(=`logStudy` 的 `todayStr()` 格式) 取当天
 
+## GitHub 仓库与 Supabase 里程碑
+- 仓库：`karlzhiqiangliu-ai/six-grade-workstation`（origin = git@github.com:karlzhiqiangliu-ai/six-grade-workstation.git）
+- 分支：`master`（f72f318，线上发布基线）｜`feature/supabase`（2b1f6cf，家长注册里程碑，已 push）
+- 标签：`v1.0-parent-register`（annotated，指向 2b1f6cf，已 push）
+- 本地因沙箱限制用扁平名 `feature-supabase` 跟踪 `origin/feature/supabase`；push 走 refspec `<sha>:refs/heads/feature/supabase`
+- 安全红线：service_role 密钥（`sb_secret_`）绝不入库；`**/supabase/API.txt` 与 `**/.env` 已在 .gitignore；anon 公钥 `sb_publishable_` 可安全出现在前端
+
 ## 数学题型（MATH_GEN_TYPES = 19）
 - 原 11：fracmul/fracdiv/fracmixed/ratio/ratiodiv/circle/ring/percent/discount/pie/direction
 - 六下 8 新：negaxis/proportion/scale/cyls/cylv/conev/pigeon/numshape
